@@ -1,0 +1,27 @@
+---
+# Fork-only: builds the unsigned Windows MSI for this branch through the
+# project's own Windows pipeline, without release, signing or symbol publishing.
+name: Fork build (Windows)
+permissions: {}
+
+on:
+  push:
+    branches:
+      - trigger-status
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    name: Windows
+    permissions:
+      actions: read
+      contents: read
+    uses: ./.github/workflows/ci-windows.yml
+    with:
+      build_only: true
+      build_tests: false
+      release_commit: ${{ github.sha }}
+      release_version: 2.0.1
+      release_artifact_retention_days: 7
+      symbol_product_name: Vibepollo
+      symbol_release_prefix: polo

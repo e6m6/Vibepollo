@@ -101,6 +101,9 @@ namespace platf {
         if (!change.accepted) {
           return;
         }
+        // Input reports carry each trigger's effect status, which libScePad
+        // games read to detect a weapon trigger's break.
+        lvg::driver::apply_ds5_trigger_programs(change.state, &state);
         lvg::feedback_event event {};
         event.type = lvg::feedback_type::playstation_output;
         event.payload_size = sizeof(change.state);
