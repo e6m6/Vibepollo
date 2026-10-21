@@ -244,8 +244,12 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $gitlink = (git rev-parse "$($env:RELEASE_COMMIT):third-party/libvirtualgamepad").Trim()
-          if ($LASTEXITCODE -ne 0 -or $gitlink -cne $env:VHF_SOURCE_REVISION) {
-            throw "Release commit does not pin libvirtualgamepad $($env:VHF_SOURCE_REVISION); got '$gitlink'."
+          if ($LASTEXITCODE -ne 0) {
+            throw "Release commit has no libvirtualgamepad gitlink."
+          }
+          # Fork: the user-mode encoder is patched; the bundled driver stays the pinned release.
+          if ($gitlink -cne $env:VHF_SOURCE_REVISION) {
+            Write-Warning "libvirtualgamepad is $gitlink, not the driver release's $($env:VHF_SOURCE_REVISION)."
           }
 
           $packageRoot = Join-Path $env:RUNNER_TEMP 'vhf-gamepad-producer-release'

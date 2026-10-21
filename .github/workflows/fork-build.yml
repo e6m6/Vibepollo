@@ -11,6 +11,28 @@ on:
   workflow_dispatch:
 
 jobs:
+  library-tests:
+    name: libvirtualgamepad tests
+    runs-on: windows-2022
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+        with:
+          persist-credentials: false
+          submodules: false
+      - name: Checkout libvirtualgamepad submodule
+        run: git submodule update --init --depth 1 third-party/libvirtualgamepad
+      - name: Build and run controller tests
+        shell: pwsh
+        working-directory: third-party/libvirtualgamepad
+        run: |
+          cmake -S driver/tests -B build/contract-tests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build build/contract-tests --config Release
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ctest --test-dir build/contract-tests -C Release --output-on-failure
+
   build-windows:
     name: Windows
     permissions:
